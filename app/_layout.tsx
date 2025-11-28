@@ -1,24 +1,42 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { useFonts } from "expo-font";
+import { SplashScreen, Stack } from "expo-router";
+import React, { useEffect } from "react";
+import { StatusBar } from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+const RootLayout = () => {
+  const [fontLoaded, error] = useFonts({
+    "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
+    "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
+    "Poppins-SemiBold": require("../assets/fonts/Poppins-SemiBold.ttf"),
+    "Poppins-Light": require("../assets/fonts/Poppins-Light.ttf"),
+    "Poppins-ExtraLight": require("../assets/fonts/Poppins-ExtraLight.ttf"),
+    "Poppins-Thin": require("../assets/fonts/Poppins-Thin.ttf"),
+    "Poppins-Black": require("../assets/fonts/Poppins-Black.ttf"),
+  });
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+  useEffect(() => {
+    if (error) {
+      console.log("Error loading fonts", error);
+    }
 
-export const unstable_settings = {
-  anchor: '(tabs)',
+    if (fontLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [error, fontLoaded]);
+
+  if (!fontLoaded) {
+    return null;
+  }
+  return (
+    <SafeAreaProvider>
+      <SafeAreaView style={{ flex: 1 }}>
+        <StatusBar translucent={true} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+        </Stack>
+      </SafeAreaView>
+    </SafeAreaProvider>
+  );
 };
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
-}
+export default RootLayout;
